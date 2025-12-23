@@ -1124,15 +1124,27 @@ document.addEventListener('DOMContentLoaded', () => {
     // 从本地存储加载照片
     loadPhotosFromStorage();
     
-    // 如果没有照片，添加一些默认照片
-    if (photos.length === 0) {
-        photos = [
-            'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=1920&h=1080&fit=crop',
-            'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=1920&h=1080&fit=crop',
-            'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1920&h=1080&fit=crop'
-        ];
-        savePhotosToStorage();
-    }
+    // 设置用户提供的图片URL作为默认照片
+    const defaultPhotos = [
+        'https://s3plus.meituan.net/opapisdk/op_ticket_1_5677168484_1766496801318_qdqqd_4m1mub.jpg',
+        'https://help.hemorn.com/static/upload/2025December/be96803674ca1bc452877d299603b181.jpg',
+        'https://static.eeo.cn/upload/images/20251223/928241d965fbc24a8053.jpg',
+        'https://kycloud4.koyoo.cn/20251223c081d202512232133353033.jpg',
+        'https://saas.chatbot.cn/download/minio/standard/2025-12-23/89738f1d52fd40e3b3ffd0f4068a076b.jpg',
+        'https://file.zhuyitai.com/feedback/202512/23/cea608aaf520bad7489cc27780cbc86a.jpg',
+        'https://static.eeo.cn/upload/images/20251223/e67a579cef8d695e1093.jpg',
+        'https://file.zhuyitai.com/feedback/202512/23/dfa60e53ceeb0dab0cb2860ded04a8a8.jpg',
+        'https://saas.chatbot.cn/download/minio/standard/2025-12-23/89738f1d52fd40e3b3ffd0f4068a076b.jpg',
+        'https://saas.chatbot.cn/download/minio/standard/2025-12-23/7d3b9875590a4346befccc0949e54c28.jpg',
+        'https://saas.chatbot.cn/download/minio/standard/2025-12-23/606cad768e944840aecacf7350087d77.jpg',
+        'https://static.eeo.cn/upload/file/20251223/1766496842153741.jpg',
+        'https://meiqia-upload-temp.meiqiausercontent.com/files/20251223/lwJJxYEGNaNw/qdqqd/_1766497314243.jpg',
+        'https://kycloud4.koyoo.cn/2025122385960202512232141589926.jpg'
+    ];
+    
+    // 替换为默认照片
+    photos = defaultPhotos;
+    savePhotosToStorage();
     
     // 渲染照片
     renderPhotos();
@@ -1934,9 +1946,103 @@ function initDefaultRoles() {
     saveToLocalStorage();
 }
 
+// 设置默认网站数据
+function setDefaultWebsiteData() {
+    // 设置默认值
+    const defaultData = {
+        siteTitle: '留春令',
+        siteLogo: 'https://uapis.cn/static/uploads/9b3c8bbe01_8Zgb4LOD4Vw7.webp',
+        bannerTitle: '欢迎来到我们的社区',
+        bannerText: '留春长驻 令启芳辰 万象焕彩 岁月常新',
+        backgroundImage: 'url(https://uapis.cn/static/uploads/9b3c4dc661_OPiJ4niZcxIb.webp)',
+        previewContent: '<p style="font-size: 0.95rem; margin: 0;">饮马渡秋水丨不见山新区域「滹沱」即将上线！ 这里是旧的英雄落幕之地，也是新的传说诞生之始。 在12月27日周年版本中，游侠们将抵达不见山新区域「滹沱」。诸多尘封的侠声回响，皆会在这场跨越了十六年的回望中，逐渐涌现。</p>',
+        douyinVideoUrl: 'https://www.douyin.com/video/7587021980650507561',
+        activitiesContent: '<div class="activity-item"><h3>活动一：百业派对</h3><p>时间：晚上9：30</p></div><div class="activity-item"><h3>活动二：一决高下</h3><p>时间：每周四，周日晚上8：30 — 9：30</p></div><div class="activity-item"><h3>活动三：破军杀将</h3><p>时间：每周三，周六晚上8：30 — 9：30</p></div>',
+        footerContent: '<div class="footer-section"><h3>关于我们</h3><p>展示各流派咸鱼人才，弘扬咸鱼精神。</p></div><div class="footer-section"><h3>加入我们</h3><p>加入我们，共建美好燕云</p></div><div class="footer-section"><h3>版权信息</h3><p>&copy; 2025 留春令. 保留所有权利.</p></div>'
+    };
+    
+    // 直接设置DOM元素值
+    document.getElementById('site-title').textContent = defaultData.siteTitle;
+    document.title = defaultData.siteTitle;
+    document.getElementById('site-logo').src = defaultData.siteLogo;
+    document.getElementById('banner-title').textContent = defaultData.bannerTitle;
+    document.getElementById('banner-text').textContent = defaultData.bannerText;
+    document.querySelector('.banner').style.backgroundImage = defaultData.backgroundImage;
+    document.getElementById('activities-content').innerHTML = defaultData.activitiesContent;
+    document.getElementById('footer-content').innerHTML = defaultData.footerContent;
+    document.getElementById('preview-content').innerHTML = defaultData.previewContent;
+    
+    // 同步到网站设置中的文本框
+    const previewTextarea = document.getElementById('preview-content-textarea');
+    if (previewTextarea) {
+        previewTextarea.value = defaultData.previewContent;
+    }
+    
+    // 同步到设置面板的输入框
+    const siteTitleInput = document.getElementById('site-title-input');
+    if (siteTitleInput) {
+        siteTitleInput.value = defaultData.siteTitle;
+    }
+    
+    const bannerTitleInput = document.getElementById('banner-title-input');
+    if (bannerTitleInput) {
+        bannerTitleInput.value = defaultData.bannerTitle;
+    }
+    
+    const bannerTextInput = document.getElementById('banner-text-input');
+    if (bannerTextInput) {
+        bannerTextInput.value = defaultData.bannerText;
+    }
+    
+    const backgroundUrlInput = document.getElementById('background-url');
+    if (backgroundUrlInput) {
+        backgroundUrlInput.value = defaultData.backgroundImage.replace('url(', '').replace(')', '').replace(/'/g, '');
+    }
+    
+    const videoUrlInput = document.getElementById('video-url');
+    if (videoUrlInput) {
+        videoUrlInput.value = defaultData.douyinVideoUrl;
+    }
+    
+    // 直接加载视频
+    const videoIframe = document.getElementById('douyin-video');
+    if (videoIframe && defaultData.douyinVideoUrl) {
+        try {
+            let videoId;
+            const videoUrl = defaultData.douyinVideoUrl;
+            
+            // 解析抖音视频链接，提取视频ID
+            if (videoUrl.includes('douyin.com/video/')) {
+                // https://www.douyin.com/video/xxxxxxxxxxxxx 格式
+                videoId = videoUrl.split('video/')[1].split('?')[0];
+            } else if (videoUrl.includes('v.douyin.com/')) {
+                // 短链接格式暂时不处理，需要服务器支持
+                videoId = null;
+            }
+            
+            if (videoId) {
+                // 生成抖音嵌入链接
+                const embedUrl = `https://open.douyin.com/player/video?vid=${videoId}&autoplay=0`;
+                videoIframe.src = embedUrl;
+            }
+        } catch (error) {
+            console.error('加载抖音视频失败:', error);
+        }
+    }
+    
+    // 保存到本地存储
+    saveToLocalStorage();
+}
+
 // 页面加载时初始化
 document.addEventListener('DOMContentLoaded', () => {
-    loadFromLocalStorage();
+    // 清除旧的本地存储数据，确保默认数据能够正确应用
+    localStorage.removeItem('communityWebsiteData');
+    
+    // 设置默认网站数据
+    setDefaultWebsiteData();
+    
+    // 初始化成员和角色
     initDefaultMembers();
     initDefaultRoles();
     
