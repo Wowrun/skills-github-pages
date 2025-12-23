@@ -1898,7 +1898,7 @@ function loadFromLocalStorage() {
                     
                     if (videoId) {
                         // 生成抖音嵌入链接
-                        const embedUrl = `https://open.douyin.com/player/video?vid=${videoId}&autoplay=0`;
+                        const embedUrl = `https://www.douyin.com/video/7587021980650507561`;
                         videoIframe.src = embedUrl;
                     }
                 } catch (error) {
@@ -2602,4 +2602,5 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // 初始状态检查
     toggleBackToTop();
+
 });
