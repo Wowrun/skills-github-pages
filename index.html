@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>留春令</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- 登录模态框 -->
+    <div id="login-modal" class="modal login-modal">
+        <div class="modal-content">
+            <h3 id="modal-title">百业内部管理系统 - 登录</h3>
+            
+            <!-- 切换按钮 -->
+            <div class="auth-toggle">
+                <button id="login-tab" class="toggle-btn active" onclick="showLoginForm()">登录</button>
+                <button id="register-tab" class="toggle-btn" onclick="showRegisterForm()">注册</button>
+            </div>
+            
+            <!-- 登录表单 -->
+            <form id="login-form">
+                <div class="form-group">
+                    <label for="login-name">姓名：</label>
+                    <input type="text" id="login-name" required>
+                </div>
+                <div class="form-group">
+                    <label for="login-martial-art">武学：</label>
+                    <input type="text" id="login-martial-art" required>
+                </div>
+                <div class="form-group">
+                    <label for="login-level">等级：</label>
+                    <input type="number" id="login-level" min="1" max="100" required>
+                </div>
+                <div class="form-group">
+                    <label for="login-password">密码（可选）：</label>
+                    <input type="password" id="login-password" placeholder="如未设置密码则留空">
+                </div>
+                <div class="modal-buttons">
+                    <button type="submit">登录</button>
+                </div>
+            </form>
+            
+            <!-- 注册表单 -->
+            <form id="register-form" style="display: none;">
+                <div class="form-group">
+                    <label for="register-name">姓名：</label>
+                    <input type="text" id="register-name" required>
+                </div>
+                <div class="form-group">
+                    <label for="register-martial-art">武学：</label>
+                    <input type="text" id="register-martial-art" required>
+                </div>
+                <div class="form-group">
+                    <label for="register-level">等级：</label>
+                    <input type="number" id="register-level" min="1" max="100" required>
+                </div>
+                <div class="form-group">
+                    <label for="register-desc">个人简介：</label>
+                    <textarea id="register-desc" rows="3" required></textarea>
+                </div>
+                <div class="modal-buttons">
+                    <button type="submit">注册</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+            <img id="site-logo" src="https://ui-avatars.com/api/?name=百业&background=3498db&color=fff&size=50" alt="网站logo" style="width: 50px; height: 50px; border-radius: 50%; margin-right: 10px; object-fit: cover;">
+            <h1 id="site-title">社区名称</h1>
+        </div>
+            <ul class="nav-menu">
+                <li class="nav-item"><a href="#home" class="nav-link">首页</a></li>
+                <li class="nav-item"><a href="#about" class="nav-link">社团宣传</a></li>
+                <li class="nav-item"><a href="#members" class="nav-link">成员介绍</a></li>
+                <li class="nav-item"><a href="#photo-album" class="nav-link">留影石</a></li>
+                <li class="nav-item"><a href="#activities" class="nav-link">社员活动</a></li>
+                <li class="nav-item"><a href="#video-preview" class="nav-link">版本前瞻</a></li>
+                <li class="nav-item" id="settings-btn-container" style="display: none;"><a href="#" class="nav-link" onclick="showAdminCenter()">设置</a></li>
+                <li class="nav-item" id="login-btn-container"><a href="#" class="nav-link" onclick="showLoginModal()">登录管理系统</a></li>
+                <li class="nav-item" id="user-info" style="display: none;">
+                    <span id="current-user"></span>
+                    <a href="#" class="nav-link" onclick="logout()">退出</a>
+                </li>
+            </ul>
+            <div class="nav-toggle">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 角色选择模态框 -->
+    <div id="role-select-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h3>角色选择</h3>
+            <div class="role-options">
+                <div class="role-option">
+                    <h4>社主</h4>
+                    <button onclick="selectRole('chief')">选择社主</button>
+                </div>
+                <div class="role-option">
+                    <h4>管理员</h4>
+                    <button onclick="selectRole('admin')">选择管理员</button>
+                </div>
+                <div class="role-option">
+                    <h4>社众</h4>
+                    <button onclick="selectRole('member')">选择社众</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 密码验证模态框 -->
+    <div id="password-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h3 id="password-modal-title">密码验证</h3>
+            <form id="password-form">
+                <div class="form-group">
+                    <label for="password-input">请输入密码：</label>
+                    <input type="password" id="password-input" required>
+                </div>
+                <div class="modal-buttons">
+                    <button type="submit">确定</button>
+                    <button type="button" onclick="cancelPassword()">取消</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 管理中心 -->
+    <div id="admin-center" class="admin-center" style="display: none;">
+        <div class="admin-center-header">
+            <h2>管理中心</h2>
+            <div class="admin-center-actions">
+                <span id="current-role"></span>
+                <button onclick="exitAdminCenter()" class="admin-btn">退出管理中心</button>
+            </div>
+        </div>
+        <div class="admin-center-content">
+            <div class="admin-sidebar">
+                <ul class="admin-menu">
+                    <li class="admin-menu-item" onclick="showChiefList()">社主列表</li>
+                    <li class="admin-menu-item" onclick="showAdminList()">管理员列表</li>
+                    <li class="admin-menu-item" onclick="showMemberList()">百业人员</li>
+                    <li class="admin-menu-item" onclick="showSettings()">网页设置</li>
+                    <li class="admin-menu-item" onclick="showAccountSettings()">账号设置</li>
+                </ul>
+            </div>
+            <div class="admin-main-content">
+                <!-- 社主列表 -->
+                <div id="chief-list-section" class="admin-section">
+                    <h3>社主列表</h3>
+                    <div id="chief-list-content"></div>
+                </div>
+                <!-- 管理员列表 -->
+                <div id="admin-list-section" class="admin-section" style="display: none;">
+                    <h3>管理员列表</h3>
+                    <div id="admin-list-content"></div>
+                </div>
+                <!-- 成员列表 -->
+                <div id="member-list-section" class="admin-section" style="display: none;">
+                    <h3>成员列表</h3>
+                    <div id="member-list-content"></div>
+                </div>
+                <!-- 设置页面 -->
+                <div id="settings-section" class="admin-section" style="display: none;">
+                    <h3>网页设置</h3>
+                    <div class="settings-buttons">
+                        <button class="settings-btn" onclick="goToSection('about')">社团宣传</button>
+                        <button class="settings-btn" onclick="goToSection('activities')">社团活动</button>
+                        <button class="settings-btn" onclick="goToSection('members')">百业人员</button>
+                        <button class="settings-btn" onclick="goToSection('photo-album')">留影石</button>
+                        <button class="settings-btn" onclick="goToSection('video-preview')">版本前瞻</button>
+                        <button class="settings-btn" onclick="goToSection('settings')">网站设置</button>
+                        <button class="settings-btn" onclick="goToSection('footer')">编辑底部内容</button>
+                    </div>
+                </div>
+                
+                <!-- 账号设置页面 -->
+                <div id="account-settings-section" class="admin-section" style="display: none;">
+                    <h3>账号设置</h3>
+                    <div class="account-settings-form">
+                        <h4 style="margin-top: 20px; margin-bottom: 15px;">角色权限密码设置</h4>
+                        <form id="role-password-form">
+                            <div class="form-group">
+                                <label for="chief-password">社主密码：</label>
+                                <input type="password" id="chief-password" placeholder="修改社主权限密码">
+                            </div>
+                            <div class="form-group">
+                                <label for="admin-password">管理员密码：</label>
+                                <input type="password" id="admin-password" placeholder="修改管理员权限密码">
+                            </div>
+                            <div class="form-group">
+                                <p style="color: #666; font-size: 0.9rem; margin: 10px 0;">提示：修改后，选择对应角色登录时需要输入新密码。</p>
+                            </div>
+                            <div class="modal-buttons">
+                                <button type="submit" class="admin-btn">保存角色密码</button>
+                            </div>
+                        </form>
+                        
+                        <h4 style="margin-top: 30px; margin-bottom: 15px;">账号登录密码设置</h4>
+                        <form id="password-change-form">
+                            <div class="form-group">
+                                <label for="new-password">新密码：</label>
+                                <input type="password" id="new-password" placeholder="留空表示不设置密码">
+                            </div>
+                            <div class="form-group">
+                                <label for="confirm-password">确认新密码：</label>
+                                <input type="password" id="confirm-password" placeholder="留空表示不设置密码">
+                            </div>
+                            <div class="form-group">
+                                <p style="color: #666; font-size: 0.9rem; margin: 10px 0;">提示：设置密码后，首次登录时将需要输入密码。</p>
+                            </div>
+                            <div class="modal-buttons">
+                                <button type="submit" class="admin-btn">保存登录密码</button>
+                                <button type="button" class="admin-btn" onclick="showSettings()">取消</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 首页横幅 -->
+    <section id="home" class="banner" style="background-image: url('https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=1920&h=1080&fit=crop');">
+        <div class="banner-overlay">
+            <div class="banner-content">
+                <h2 id="banner-title">欢迎来到我们的社区</h2>
+                <p id="banner-text">这里是我们共同的家园，一起创造美好未来</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 社团宣传 -->
+    <section id="about" class="about-section">
+        <div class="container">
+            <h2 class="section-title">社团宣传</h2>
+            <div class="editable-content" id="about-content">
+                <p>我们是一个充满活力和创意的社区，致力于为成员提供交流、学习和成长的平台。</p>
+                <p>在这里，你可以结识志同道合的朋友，参与各种有趣的活动，展示你的才华和能力。</p>
+            </div>
+            <button class="edit-btn" onclick="editSection('about-content')">编辑内容</button>
+        </div>
+    </section>
+
+    <!-- 成员介绍 -->
+    <section id="members" class="members-section">
+        <div class="container">
+            <h2 class="section-title">百业人员</h2>
+            <div class="subtitle">精英人才，各展风采</div>
+        </div>
+        
+        <div class="character-gallery" id="character-gallery">
+            <!-- 左侧角色列表 -->
+            <div class="character-list" id="character-list">
+                <!-- 角色头像将通过JavaScript动态生成 -->
+                <!-- 添加成员按钮 -->
+                <div class="character-item add-character-btn" id="add-character-btn" title="添加新成员">
+                    <div class="character-avatar" style="display: flex; align-items: center; justify-content: center; font-size: 2rem; color: #3498db; background-color: #2D3748;">
+                        +
+                    </div>
+                    <div class="character-overlay">
+                        <div class="character-name-tooltip">添加成员</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 右侧背景展示区 -->
+            <div class="character-background" id="character-background">
+                <!-- 角色信息展示 -->
+                <div class="character-info" id="character-info">
+                    <h3 class="character-name" id="character-name">请选择成员</h3>
+                    <p class="character-position" id="character-position">--</p>
+                    <p class="character-job" id="character-job">--</p>
+                    <p class="character-desc" id="character-desc">点击左侧成员头像查看详情</p>
+                </div>
+                
+                <!-- 编辑按钮 -->
+                <button class="edit-btn bg-edit-btn" onclick="editCharacterBackground()">更换背景</button>
+            </div>
+        </div>
+        
+        <!-- 添加成员和更改成员信息按钮 -->
+        <div class="container" style="display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 20px;">
+            <button class="add-btn" onclick="addMember()">添加成员</button>
+            <button class="edit-btn" id="edit-member-btn" onclick="editSelectedMember()" style="display: none;">更改成员信息</button>
+        </div>
+    </section>
+
+    <!-- 留影石板块 -->
+    <section id="photo-album" class="photo-album-section">
+        <div class="photo-carousel-container full-width">
+            <!-- 左右切换按钮 -->
+            <button class="carousel-btn carousel-btn-left" onclick="changePhoto(-1)">
+                <span>&lt;</span>
+            </button>
+            
+            <!-- 照片轮播区域 -->
+            <div class="photo-carousel full-height">
+                <div class="photo-wrapper" id="photo-wrapper">
+                    <!-- 照片将通过JavaScript动态生成 -->
+                </div>
+            </div>
+            
+            <!-- 左右切换按钮 -->
+            <button class="carousel-btn carousel-btn-right" onclick="changePhoto(1)">
+                <span>&gt;</span>
+            </button>
+        </div>
+        
+        <!-- 编辑按钮 -->
+        <button class="edit-btn" onclick="openPhotoEditModal()" style="position: absolute; bottom: 20px; right: 20px; z-index: 20;">编辑照片</button>
+    </section>
+
+    <!-- 社员活动 -->
+    <section id="activities" class="activities-section">
+        <div class="container">
+            <h2 class="section-title">社员活动</h2>
+            <div class="editable-content" id="activities-content">
+                <div class="activity-item">
+                    <h3>活动一：社区聚会</h3>
+                    <p>时间：2024年1月1日</p>
+                    <p>地点：社区中心</p>
+                    <p>内容：新年联欢，才艺展示</p>
+                </div>
+                <div class="activity-item">
+                    <h3>活动二：志愿服务</h3>
+                    <p>时间：2024年2月14日</p>
+                    <p>地点：敬老院</p>
+                    <p>内容：陪伴老人，送温暖</p>
+                </div>
+            </div>
+            <button class="edit-btn" onclick="editSection('activities-content')">编辑内容</button>
+        </div>
+    </section>
+
+    <!-- 版本前瞻区域 -->
+    <section id="video-preview" class="video-preview-section">
+        <!-- 背景层 -->
+        <div class="video-showcase-background" style="background-image: url('https://www.yysls.cn/pc/gw/20220815175950/img/mhys/bz/17_33f9186.jpg?image_process=format,jpg');">
+            <div class="video-showcase-overlay" style="background: linear-gradient(135deg, rgba(154, 103, 211, 0.3) 10%, rgba(0, 0, 0, 0.5) 100%);"></div>
+        </div>
+        
+        <div class="video-showcase-container">
+            <!-- 头部区域 -->
+            <div class="video-showcase-header">
+                <h2 class="section-title">版本前瞻</h2>
+            </div>
+            
+            <!-- 可编辑文本区域 -->
+            <div class="editable-content" id="preview-content" style="background-color: transparent; color: white; margin-bottom: 5px; text-align: center; padding: 5px 0; line-height: 1.5;">
+                <p style="font-size: 0.95rem; margin: 0;">这里是版本前瞻的详细内容，可以在这里添加版本更新的说明、亮点介绍等信息。</p>
+            </div>
+            
+            <!-- 视频播放区域 -->
+            <div class="video-showcase-player">
+                <iframe id="douyin-video" src="" frameborder="0" allowfullscreen></iframe>
+            </div>
+        </div>
+    </section>
+
+    <!-- 设置面板 -->
+    <section id="settings" class="settings-section" style="display: none;">
+        <div class="container">
+            <h2 class="section-title">网站设置</h2>
+            <div class="settings-container">
+                <div class="setting-item">
+                    <label for="site-title-input">网站标题：</label>
+                    <input type="text" id="site-title-input" placeholder="输入网站标题">
+                    <button onclick="updateSiteTitle()">保存</button>
+                </div>
+                <div class="setting-item">
+                    <label for="banner-title-input">横幅标题：</label>
+                    <input type="text" id="banner-title-input" placeholder="输入横幅标题">
+                    <button onclick="updateBannerTitle()">保存</button>
+                </div>
+                <div class="setting-item">
+                    <label for="banner-text-input">横幅副标题：</label>
+                    <input type="text" id="banner-text-input" placeholder="输入横幅副标题">
+                    <button onclick="updateBannerText()">保存</button>
+                </div>
+                <div class="setting-item">
+                    <label for="background-url">背景图片URL：</label>
+                    <input type="text" id="background-url" placeholder="输入背景图片URL">
+                    <button onclick="updateBackground()">更新背景</button>
+                </div>
+                <div class="setting-item">
+                    <label for="site-logo-url">网站log：</label>
+                    <input type="text" id="site-logo-url" placeholder="输入网站log图片URL">
+                    <button onclick="updateLogo()" class="action-btn">保存</button>
+                </div>
+                <div class="setting-item">
+                    <label for="video-url">抖音视频链接：</label>
+                    <input type="text" id="video-url" placeholder="输入抖音视频链接">
+                    <button onclick="loadDouyinVideo()" class="action-btn">保存并播放</button>
+                </div>
+                <div class="setting-item" style="margin-top: 30px;">
+                    <label for="preview-content-textarea">前瞻内容：</label>
+                    <textarea id="preview-content-textarea" rows="5" placeholder="输入版本前瞻的详细内容" style="flex: 1;"></textarea>
+                    <button onclick="updatePreviewContent()" class="action-btn">保存</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 编辑模态框 -->
+    <div id="edit-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h3>编辑内容</h3>
+            <textarea id="edit-textarea" rows="10"></textarea>
+            <div class="modal-buttons">
+                <button onclick="saveEdit()">保存</button>
+                <button onclick="cancelEdit()">取消</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 照片编辑模态框 -->
+    <div id="photo-edit-modal" class="modal">
+        <div class="modal-content photo-edit-content">
+            <div class="photo-edit-header">
+                <h3>编辑留影石照片</h3>
+                <span class="close" onclick="closePhotoEditModal()">&times;</span>
+            </div>
+            
+            <div class="photo-list" id="photo-list">
+                <!-- 照片列表将通过JavaScript动态生成 -->
+            </div>
+            
+            <!-- 添加照片部分 -->
+            <div class="add-photo-section">
+                <h4>添加新照片</h4>
+                <input type="text" id="photo-url-input" placeholder="输入照片URL">
+                <button class="add-photo-btn" onclick="addPhoto()">添加照片</button>
+            </div>
+            
+            <div class="modal-buttons">
+                <button onclick="savePhotoChanges()">保存更改</button>
+                <button onclick="closePhotoEditModal()">取消</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 成员编辑模态框 -->
+    <div id="member-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h3 id="member-modal-title">添加成员</h3>
+            <form id="member-form">
+                <input type="hidden" id="member-id">
+                <div class="form-group">
+                    <label for="member-name">姓名：</label>
+                    <input type="text" id="member-name" required>
+                </div>
+                <div class="form-group">
+                    <label for="member-position">职位：</label>
+                    <input type="text" id="member-position" required>
+                </div>
+                <div class="form-group">
+                    <label for="member-job">职业：</label>
+                    <input type="text" id="member-job" required>
+                </div>
+                <div class="form-group">
+                    <label for="member-level">等级：</label>
+                    <input type="number" id="member-level" min="1" max="100" required>
+                </div>
+                <div class="form-group">
+                    <label for="member-avatar">头像URL：</label>
+                    <input type="text" id="member-avatar" placeholder="输入头像URL">
+                </div>
+                <div class="form-group">
+                    <label for="member-bg">背景URL：</label>
+                    <input type="text" id="member-bg" placeholder="输入背景图片URL">
+                </div>
+                <div class="form-group">
+                    <label for="member-desc">个人简介：</label>
+                    <textarea id="member-desc" rows="3" placeholder="输入个人简介"></textarea>
+                </div>
+                <div class="modal-buttons">
+                    <button type="submit">保存</button>
+                    <button type="button" onclick="cancelMemberEdit()">取消</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 角色管理模态框 -->
+    <div id="role-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h3>角色管理</h3>
+            <div class="role-section">
+                <h4>社主管理（最多2名）</h4>
+                <div id="chiefs-list"></div>
+                <button onclick="addChief()" class="add-btn">添加社主</button>
+            </div>
+            <div class="role-section">
+                <h4>管理员管理</h4>
+                <div id="admins-list"></div>
+                <button onclick="addAdmin()" class="add-btn">添加管理员</button>
+            </div>
+            <div class="modal-buttons">
+                <button onclick="closeRoleModal()">关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 选择成员模态框 -->
+    <div id="select-member-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h3 id="select-member-title">选择成员</h3>
+            <div id="available-members"></div>
+            <div class="modal-buttons">
+                <button onclick="closeSelectMemberModal()">取消</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 网站底部 -->
+    <footer id="footer" class="footer">
+        <div class="container">
+            <div class="footer-content" id="footer-content">
+                <div class="footer-section">
+                    <h3>关于我们</h3>
+                    <p>我们是一个充满活力和创意的社区，致力于为成员提供交流、学习和成长的平台。</p>
+                </div>
+                <div class="footer-section">
+                    <h3>联系方式</h3>
+                    <p>邮箱：contact@community.com</p>
+                    <p>地址：北京市朝阳区社区中心</p>
+                </div>
+                <div class="footer-section">
+                    <h3>版权信息</h3>
+                    <p>&copy; 2024 社区名称. 保留所有权利.</p>
+                </div>
+            </div>
+            <button class="edit-btn" onclick="editSection('footer-content')" style="margin-top: 5px;">编辑底部内容</button>
+        </div>
+    </footer>
+
+    <!-- 回到顶部按钮 -->
+    <button id="back-to-top" class="back-to-top-btn" onclick="scrollToTop()">
+        <span>&uarr;</span>
+    </button>
+
+    <!-- 音频元素 -->
+    <audio id="backgroundAudio" loop>
+        <source id="backgroundAudioSource" src="" type="audio/mpeg">
+        您的浏览器不支持音频播放。
+    </audio>
+
+    <!-- 音频播放器UI -->
+    <div class="audio-player">
+        <button id="audioToggleBtn" class="audio-player__toggle-btn">
+            <span class="audio-player__play-icon">▶</span>
+        </button>
+        <input type="range" id="audioVolumeSlider" class="audio-player__volume-slider" min="0" max="1" step="0.01" value="0.3">
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
